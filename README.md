@@ -42,4 +42,4 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 <p>You can customize the application's appearance and functionality by modifying the color_scheme.py and custom_style.py files to suit your preferences.</p>
 
 <h2>License</h2>
-This project is licensed under the GNU Lesser General Public License See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU Lesser General Public License See the ([LICENSE]http://www.gnu.org/licenses) file for details.
