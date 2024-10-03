@@ -15,7 +15,7 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 <p>To run the application, ensure you have Python installed on your computer. Then, follow these steps:</p>
 • First, create a json file named <em>"creds.json"</em> on the root folder where you need to put three data:
 
-```ruby
+```python
 {
   "base_url": "your-jira-base-url",
   "token": "your-jira-token",
@@ -23,20 +23,23 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 }
 ```
 • Second, Clone the repository:
-<pre><code id=code-block>  git clone https://github.com/Code-Me-N0t/Jira-Logger-App.git
+```python
+  git clone https://github.com/Code-Me-N0t/Jira-Logger-App.git
   cd JiraLoggerApp
-</code></pre>
+```
 • Third, install the required package/s:
-<pre><code>pip install -r requirements.txt
-</code></pre>
+```python
+  pip install -r requirements.txt
+```
 • Fourth, run the application:
-<pre><code>python timelogger_fe.py
-</code></pre>
+```python
+  python timelogger_fe.py
+```
 <i>* You can also run the executable file created in the <b>dist</b> folder</i>
 
 <h2>Usage</h2>
 <p>• Launch the application</p>
-<p>• Use the "Search" tab to enter your JQL query and click the "Search for Bugs" button to retrieve issues</p>
+<p>• Use the "Search" tab to enter your JQL query and click the "Search" button to retrieve issues</p>
 <p>• In the "Log Time" tab, enter the issue key, time spent, and a comment, then click "Create" to log your time.</p>
 <p>• In the "Create Ticket" tab, fill in the necessary details to create a new ticket and click "Create" to submit it.</p>
 
