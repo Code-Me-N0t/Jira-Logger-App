@@ -20,21 +20,26 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
   "email: "your-work-email"
   }
 </code></pre>
-<br>
 • Second, Clone the repository:
 <pre><code id=code-block>  git clone https://github.com/Code-Me-N0t/Jira-Logger-App.git
   cd JiraLoggerApp
 </code></pre>
-<br>
 • Third, install the required package/s:
 <pre><code>pip install -r requirements.txt
 </code></pre>
-<br>
 • Fourth, run the application:
 <pre><code>python timelogger_fe.py
 </code></pre>
-<br>
 <i>* You can also run the executable file created in the <b>dist</b> folder</i>
 
+<h2>Usage</h2>
+<p>• Launch the application</p>
+<p>• Use the "Search" tab to enter your JQL query and click the "Search for Bugs" button to retrieve issues</p>
+<p>• In the "Log Time" tab, enter the issue key, time spent, and a comment, then click "Create" to log your time.</p>
+<p>• In the "Create Ticket" tab, fill in the necessary details to create a new ticket and click "Create" to submit it.</p>
 
-<pre><code id=code-block>try</code></pre>
+<h2>Customization</h2>
+<p>You can customize the application's appearance and functionality by modifying the color_scheme.py and custom_style.py files to suit your preferences.</p>
+
+<h2>License</h2>
+This project is licensed under the GNU Lesser General Public License See the %LICENSE file for details.
