@@ -7,7 +7,7 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 <h5>• Create Tickets:</h5>&nbsp Easily create new JIRA tickets with project keys, issue types, summaries, and descriptions.
 <br>
 <h2>Tools</h2>
-<h5>• Python:</h5> The core programming language for building the application.
+<p><h5>• Python:</h5> The core programming language for building the application.</p>
 <h5>• Tkinter:</h5> Used for creating the GUI.
 <h5>• JIRA API:</h5> Interaction with JIRA's API for fetching and managing issues.
 <br>
