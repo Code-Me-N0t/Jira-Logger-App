@@ -24,7 +24,7 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 </code></pre>
 <br>
 • Second, Clone the repository:
-<pre><code id=code-block>
+<pre><code id=code-block><i>//bash:</i>
   git clone https://github.com/Code-Me-N0t/Jira-Logger-App.git
   cd JiraLoggerApp
 </code></pre>
