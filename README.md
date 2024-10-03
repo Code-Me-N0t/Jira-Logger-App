@@ -14,6 +14,7 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 <h2>Installation</h2>
 <p>To run the application, ensure you have Python installed on your computer. Then, follow these steps:</p>
 • First, create a json file named <em>"creds.json"</em> on the root folder where you need to put three data:
+
 ```python
 {
   "base_url": "your-jira-base-url",
@@ -44,3 +45,4 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 
 <h2>License</h2>
 This project is licensed under the GNU Lesser General Public License See the <a href="http://www.gnu.org/licenses">LICENSE</a> file for details.
+
