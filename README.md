@@ -28,8 +28,23 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 git clone
 <pre><code id=code-block>
   <i>//bash:</i>
-  git clone 
+  git clone https://github.com/Code-Me-N0t/Jira-Logger-App.git
+  cd JiraLoggerApp
 </code></pre>
+<br>
+• Third, install the required package/s:
+<pre><code>
+  <i>//bash:</i>
+  pip install -r requirements.txt
+</code></pre>
+<br>
+• Fourth, run the application:
+<pre><code>
+  <i>//bash:</i>
+  python timelogger_fe.py
+</code></pre>
+<br>
+<i>* You can also run the executable file created in the <b>dist</b> folder</i>
 
 
 <pre><code id=code-block>try</code></pre>
