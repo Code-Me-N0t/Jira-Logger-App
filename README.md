@@ -23,9 +23,13 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
   }
 </code></pre>
 <br>
-• Second, Clone the repositoryL
+• Second, Clone the repository:
 ```bash
 git clone
+<pre><code id=code-block>
+  <i>//bash:</i>
+  git clone 
+</code></pre>
 
 
 <pre><code id=code-block>try</code></pre>
