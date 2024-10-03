@@ -45,7 +45,7 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 This project is licensed under the GNU Lesser General Public License See the <a href="http://www.gnu.org/licenses">LICENSE</a> file for details.
 
 
-```json
+```python
 require 'redcarpet'
 markdown = Redcarpet.new("Hello World!")
 puts markdown.to_html
