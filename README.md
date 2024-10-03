@@ -14,11 +14,14 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 <h2>Installation</h2>
 <p>To run the application, ensure you have Python installed on your computer. Then, follow these steps:</p>
 • First, create a json file named <em>"creds.json"</em> on the root folder where you need to put three data:
-<pre><code id=code-block>  {
+<pre><code id=code-block>
+  ```python
+{
   "base_url": "your-jira-base-url",
   "token": "your-jira-token",
-  "email: "your-work-email"
-  }
+  "email": "your-work-email"
+}
+```
 </code></pre>
 • Second, Clone the repository:
 <pre><code id=code-block>  git clone https://github.com/Code-Me-N0t/Jira-Logger-App.git
@@ -43,12 +46,3 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 
 <h2>License</h2>
 This project is licensed under the GNU Lesser General Public License See the <a href="http://www.gnu.org/licenses">LICENSE</a> file for details.
-
-
-```ruby
-{
-  "base_url": "your-jira-base-url",
-  "token": "your-jira-token",
-  "email: "your-work-email"
-}
-```
