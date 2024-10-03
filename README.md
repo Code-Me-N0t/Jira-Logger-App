@@ -49,3 +49,5 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 <h2>License</h2>
 This project is licensed under the GNU Lesser General Public License See the <a href="http://www.gnu.org/licenses">LICENSE</a> file for details.
 
+This site was built using [GitHub Pages](https://pages.github.com/).
+
