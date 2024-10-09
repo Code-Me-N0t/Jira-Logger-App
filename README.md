@@ -14,7 +14,7 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 <h2>Installation</h2>
 <p>To run the application, ensure you have Python installed on your computer. Then, follow these steps:</p>
 • First, create a json file named <em>"creds.json"</em> on the root folder where you need to put three data:
-<pre>
+
 ```shell
 {
   "base_url": "your-jira-base-url",
@@ -22,7 +22,6 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
   "email": "your-work-email"
 }
 ```
-</pre>
 • Second, Clone the repository:
 ```shell
   git clone https://github.com/Code-Me-N0t/Jira-Logger-App.git
