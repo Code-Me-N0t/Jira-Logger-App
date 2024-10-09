@@ -14,15 +14,15 @@ I created a simple lighweight and user-friendly Jira Logger App designed to inte
 <h2>Installation</h2>
 <p>To run the application, ensure you have Python installed on your computer. Then, follow these steps:</p>
 • First, create a json file named <em>"creds.json"</em> on the root folder where you need to put three data:
-
-<code style="border-radius: 10px;" id="code-block">
+<pre style="border-radius: 10px;">
+<code id="code-block">
 ```shell
 {
   "base_url": "your-jira-base-url",
   "token": "your-jira-token",
   "email": "your-work-email"
 }
-</code>
+</code></pre>
 ```
 • Second, Clone the repository:
 ```shell
