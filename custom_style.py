@@ -29,7 +29,7 @@ class CustomStyle:
                         ("!selected", self.color.secondary_bg),
                         ("selected", self.color.primary_bg)
                     ],
-                    "expand": [("selected", [1, 1, 1, 0])]
+                    "expand": [("selected", [1, 1, 1, 0])],
                 }
             },
             "CustomFrame.TFrame": { 

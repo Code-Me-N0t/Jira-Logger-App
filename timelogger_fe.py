@@ -63,6 +63,7 @@ class JiraLoggerApp:
 
         self.close_button = tk.Button(self.title_frame, image=self.close_icon, bg=self.color.secondary_bg, borderwidth=0, command=self.close_window)
         self.close_button.pack(side="right", padx=5, pady=10)
+        self.close_button.configure(cursor="hand2")
 
         # Create a frame for the notebook inside the outer frame
         self.frame = ttk.Frame(self.outer_frame, style="Custom.TFrame")
@@ -142,7 +143,7 @@ class JiraLoggerApp:
         # Search Query Setup in search_frame
         self.jql_label = tk.Label(self.search_frame, text="Enter your JQL query:", bg=self.color.primary_bg, fg=self.color.secondary_fg)
         self.jql_entry = tk.Text(self.search_frame, width=40, height=3, pady=5, padx=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
-        self.search_button = ttk.Button(self.search_frame, text="Search", command=lambda: self.jira_api.search_jql_query(self.jql_entry))
+        self.search_button = ttk.Button(self.search_frame, text="Search", command=lambda: self.jira_api.search_jql_query(self.jql_entry), padding=(10, 5))
         self.search_button.configure(cursor="hand2")
 
         self.jql_label.pack(pady=(15, 2))
