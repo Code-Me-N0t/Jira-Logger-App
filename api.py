@@ -102,7 +102,6 @@ class JiraAPI:
         data = {
             "body": comment_text
         }
-        
+
         response = requests.post(jira_api_url, headers=headers, auth=self.auth, json=data)
-        print(f'Response: {response.json()}')
         return response.status_code == 201
