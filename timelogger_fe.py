@@ -182,7 +182,6 @@ class JiraLoggerApp:
         self.summary_entry.pack(pady=5)
         self.description_label.pack(pady=2)
         self.description_entry.pack(pady=5)
-
         self.created_issue_label.pack(pady=5)
 
     def setup_comment_ticket_ui(self):
@@ -197,10 +196,9 @@ class JiraLoggerApp:
         self.comment_label = tk.Label(self.comment_ticket, text="Comment:", bg=self.color.primary_bg, fg=self.color.secondary_fg)
         self.comment_entry = tk.Text(self.comment_ticket, width=40, height=5, padx=5, pady=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
 
-        
-        self.comment_button = ttk.Button(self.comment_ticket, text="Add Comment", command=self.add_comment_to_issue, padding=(10, 5))
-        self.comment_button.pack(side=tk.BOTTOM, pady=(2, 20))
-        self.comment_button.configure(cursor="hand2")
+        self.perform_button = ttk.Button(self.comment_ticket, text="Add Comment", command=self.add_comment_to_issue, padding=(10, 5))
+        self.perform_button.pack(side=tk.BOTTOM, pady=(2, 20))
+        self.perform_button.configure(cursor="hand2")
 
         self.comment_success_message_label = tk.Label(self.comment_ticket, text="", fg="green", bg=self.color.primary_bg)
 
@@ -210,7 +208,6 @@ class JiraLoggerApp:
         self.comment_fetch_issue_button.pack(pady=5)
         self.comment_label.pack(pady=2)
         self.comment_entry.pack(pady=5)
-        self.comment_button.pack(pady=10)
         self.comment_success_message_label.pack(pady=5)
 
     def fetch_issue(self):

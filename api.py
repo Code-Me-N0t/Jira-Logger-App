@@ -8,14 +8,12 @@ class JiraAPI:
         self.use = creds
         self.jira_domain = f"{self.use['base_url']}"
         self.auth = HTTPBasicAuth(f"{self.use['email']}", f"{self.use['token']}")
+        self.headers = { "Accept": "application/json" }
 
     def search_jira_issues(self, issue_key):
         jira_api_url = f"{self.jira_domain}/rest/api/2/issue/{issue_key}"
-        headers = {
-            "Accept": "application/json"
-        }
 
-        response = requests.get(jira_api_url, headers=headers, auth=self.auth)
+        response = requests.get(jira_api_url, headers=self.headers, auth=self.auth)
 
         if response.status_code == 200:
             issue = response.json()
@@ -28,11 +26,8 @@ class JiraAPI:
 
         jql_query = jql_entry.get("1.0", "end-1c").strip()
 
-        headers = {
-            "Accept": "application/json"
-        }
-
-        response = requests.get(jira_api_url, headers=headers, auth=self.auth, params={'jql': jql_query})
+        query_params = {'jql': jql_query}
+        response = requests.get(jira_api_url, headers=self.headers, auth=self.auth, params=query_params)
 
         if response.status_code == 200:
             issues = response.json().get('issues', [])
@@ -47,29 +42,19 @@ class JiraAPI:
 
     def log_time_on_issue(self, issue_key, time_spent, comment):
         jira_api_url = f"{self.jira_domain}/rest/api/2/issue/{issue_key}/worklog"
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
 
         data = {
             "timeSpent": time_spent,
             "comment": comment
         }
 
-        response = requests.post(jira_api_url, headers=headers, auth=self.auth, json=data)
+        response = requests.post(jira_api_url, headers=self.headers, auth=self.auth, json=data)
 
         if response.status_code != 201:
             raise Exception(f"Failed to log time: {response.status_code} - {response.text}")
 
     def create_jira_issue(self, summary, description, issue_type, project_key):
         jira_api_url = f"{self.jira_domain}/rest/api/2/issue"
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
 
         data = {
             "fields": {
@@ -84,7 +69,7 @@ class JiraAPI:
             }
         }
 
-        response = requests.post(jira_api_url, headers=headers, auth=self.auth, json=data)
+        response = requests.post(jira_api_url, headers=self.headers, auth=self.auth, json=data)
 
         if response.status_code == 201:
             return response.json().get('key')
@@ -94,14 +79,9 @@ class JiraAPI:
     def add_comment(self, issue_key, comment_text):
         jira_api_url = f"{self.jira_domain}/rest/api/2/issue/{issue_key}/comment"
 
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-
         data = {
             "body": comment_text
         }
 
-        response = requests.post(jira_api_url, headers=headers, auth=self.auth, json=data)
+        response = requests.post(jira_api_url, headers=self.headers, auth=self.auth, json=data)
         return response.status_code == 201
