@@ -80,53 +80,24 @@ class JiraLoggerApp:
         self.search_frame.configure(padding=5)
         self.time_log_frame = ttk.Frame(self.notebook, style="CustomFrame.TFrame")
         self.create_ticket = ttk.Frame(self.notebook, style="CustomFrame.TFrame")
+        self.comment_ticket = ttk.Frame(self.notebook, style="CustomFrame.TFrame")
 
         # Add frames to the notebook
         self.notebook.add(self.search_frame, text="Search")
         self.notebook.add(self.time_log_frame, text="Log Time")
         self.notebook.add(self.create_ticket, text="Create Ticket")
+        self.notebook.add(self.comment_ticket, text="Comment Ticket")
 
         self.setup_search_ui()
         self.setup_time_log_ui()
         self.setup_create_ticket_ui()
+        self.setup_comment_ticket_ui()
 
         # Bind mouse events for dragging the window
         self.title_frame.bind("<ButtonPress-1>", self.on_press)
         self.title_frame.bind("<B1-Motion>", self.on_drag)
         self.canvas.bind("<ButtonPress-1>", self.on_press)
         self.canvas.bind("<B1-Motion>", self.on_drag)
-
-    def create_rounded_rectangle(self, x1, y1, x2, y2, radius, **kwargs):
-        points = [x1+radius, y1,
-                  x1+radius, y1,
-                  x2-radius, y1,
-                  x2-radius, y1,
-                  x2, y1,
-                  x2, y1+radius,
-                  x2, y1+radius,
-                  x2, y2-radius,
-                  x2, y2-radius,
-                  x2, y2,
-                  x2-radius, y2,
-                  x2-radius, y2,
-                  x1+radius, y2,
-                  x1+radius, y2,
-                  x1, y2,
-                  x1, y2-radius,
-                  x1, y2-radius,
-                  x1, y1+radius,
-                  x1, y1+radius,
-                  x1, y1]
-        return self.canvas.create_polygon(points, **kwargs, smooth=True)
-
-    def close_window(self):
-        self.master.destroy()
-
-    def set_window_position(self, x, y):
-        self.master.update_idletasks()
-        width = self.master.winfo_width()
-        height = self.master.winfo_height()
-        self.master.geometry(f"{width}x{height}+{x}+{y}")
 
     def perform_jql_search(self):
         jql_query = self.jql_entry.get("1.0", tk.END).strip()
@@ -214,6 +185,34 @@ class JiraLoggerApp:
 
         self.created_issue_label.pack(pady=5)
 
+    def setup_comment_ticket_ui(self):
+        self.comment_issue_key_label = tk.Label(self.comment_ticket, text="Enter Issue Key (e.g., PRD-123):", bg=self.color.primary_bg, fg=self.color.secondary_fg)
+        self.comment_issue_key_entry = tk.Text(self.comment_ticket, width=20, height=1, pady=5, padx=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
+
+        self.comment_fetch_issue_button = ttk.Button(self.comment_ticket, text="Fetch Issue", command=self.comment_fetch_issue)
+        self.comment_fetch_issue_button.configure(cursor="hand2")
+
+        self.created_issue_label = tk.Label(self.comment_ticket, text="", fg="green", bg=self.color.primary_bg, width=40)
+
+        self.comment_label = tk.Label(self.comment_ticket, text="Comment:", bg=self.color.primary_bg, fg=self.color.secondary_fg)
+        self.comment_entry = tk.Text(self.comment_ticket, width=40, height=5, padx=5, pady=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
+
+        
+        self.comment_button = ttk.Button(self.comment_ticket, text="Add Comment", command=self.add_comment_to_issue, padding=(10, 5))
+        self.comment_button.pack(side=tk.BOTTOM, pady=(2, 20))
+        self.comment_button.configure(cursor="hand2")
+
+        self.comment_success_message_label = tk.Label(self.comment_ticket, text="", fg="green", bg=self.color.primary_bg)
+
+
+        self.comment_issue_key_label.pack(pady=(15, 2))
+        self.comment_issue_key_entry.pack(pady=5)
+        self.comment_fetch_issue_button.pack(pady=5)
+        self.comment_label.pack(pady=2)
+        self.comment_entry.pack(pady=5)
+        self.comment_button.pack(pady=10)
+        self.comment_success_message_label.pack(pady=5)
+
     def fetch_issue(self):
         issue_key = self.issue_key_entry.get("1.0", tk.END).strip()
         if not issue_key:
@@ -225,6 +224,36 @@ class JiraLoggerApp:
                 self.success_message_label.config(text=f"Issue {issue_key} fetched successfully!")
             else:
                 messagebox.showerror("Error", f"Issue {issue_key} not found.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def comment_fetch_issue(self):
+        issue_key = self.comment_issue_key_entry.get("1.0", tk.END).strip()
+        if not issue_key:
+            messagebox.showerror("Error", "Issue key cannot be empty.")
+            return
+        try:
+            issue = self.jira_api.search_jira_issues(issue_key)
+            if issue:
+                self.comment_success_message_label.config(text=f"Issue {issue_key} fetched successfully!")
+            else:
+                messagebox.showerror("Error", f"Issue {issue_key} not found.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def add_comment_to_issue(self):
+        issue_key = self.comment_issue_key_entry.get("1.0", tk.END).strip()
+        comment_text = self.comment_entry.get("1.0", tk.END).strip()
+
+        if not issue_key or not comment_text:
+            messagebox.showerror("Error", "Issue key and comment cannot be empty.")
+            return
+        try:
+            response = self.jira_api.add_comment(issue_key, comment_text)
+            if response:
+                self.comment_success_message_label.config(text=f"Comment added to {issue_key} successfully!")
+            else:
+                messagebox.showerror("Error", f"Failed to add comment to {issue_key}.")
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
@@ -259,6 +288,38 @@ class JiraLoggerApp:
             self.created_issue_label.config(text=f"Issue {issue_key} created successfully!")
         except Exception as e:
             messagebox.showerror("Error", str(e))
+
+    def create_rounded_rectangle(self, x1, y1, x2, y2, radius, **kwargs):
+        points = [x1+radius, y1,
+                  x1+radius, y1,
+                  x2-radius, y1,
+                  x2-radius, y1,
+                  x2, y1,
+                  x2, y1+radius,
+                  x2, y1+radius,
+                  x2, y2-radius,
+                  x2, y2-radius,
+                  x2, y2,
+                  x2-radius, y2,
+                  x2-radius, y2,
+                  x1+radius, y2,
+                  x1+radius, y2,
+                  x1, y2,
+                  x1, y2-radius,
+                  x1, y2-radius,
+                  x1, y1+radius,
+                  x1, y1+radius,
+                  x1, y1]
+        return self.canvas.create_polygon(points, **kwargs, smooth=True)
+
+    def close_window(self):
+        self.master.destroy()
+
+    def set_window_position(self, x, y):
+        self.master.update_idletasks()
+        width = self.master.winfo_width()
+        height = self.master.winfo_height()
+        self.master.geometry(f"{width}x{height}+{x}+{y}")
 
     def on_press(self, event):
         self.x = event.x

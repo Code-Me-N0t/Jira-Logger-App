@@ -90,3 +90,19 @@ class JiraAPI:
             return response.json().get('key')
         else:
             raise Exception(f"Failed to create issue: {response.status_code} - {response.text}")
+        
+    def add_comment(self, issue_key, comment_text):
+        jira_api_url = f"{self.jira_domain}/rest/api/2/issue/{issue_key}/comment"
+
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+
+        data = {
+            "body": comment_text
+        }
+        
+        response = requests.post(jira_api_url, headers=headers, auth=self.auth, json=data)
+        print(f'Response: {response.json()}')
+        return response.status_code == 201
