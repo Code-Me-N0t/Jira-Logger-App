@@ -11,17 +11,17 @@ class CustomStyle:
         self.style.theme_create("custom_theme", parent="alt", settings={
             "TNotebook": {
                 "configure": {
+                    "borderwidth": 0,
                     "tabmargins": [2, 5, 2, 0],
                     "background": self.color.secondary_bg,
-                    "borderwidth": 0,
                     "foreground": self.color.secondary_fg,
                 }
             },
             "TNotebook.Tab": {
                 "configure": {
+                    "borderwidth": 0,
                     "padding": [5, 5],
                     "background": self.color.secondary_bg,
-                    "borderwidth": 0,
                     "foreground": self.color.secondary_fg,
                 },
                 "map": {

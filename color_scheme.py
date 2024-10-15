@@ -6,3 +6,4 @@ class Color:
 
         self.primary_fg = "white"
         self.secondary_fg = "#B9B4C7"
+        self.tertiary = "#FBFCF8"

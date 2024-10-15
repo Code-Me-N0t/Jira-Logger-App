@@ -13,3 +13,4 @@ def load_json(filename):
     return creds
 
 creds = load_json('creds.json')
+data = load_json('data.json')
