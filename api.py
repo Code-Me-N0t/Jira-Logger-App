@@ -40,12 +40,13 @@ class JiraAPI:
             messagebox.showerror("Error", f"Failed to fetch issues: {response.status_code} - {response.text}")
 
 
-    def log_time_on_issue(self, issue_key, time_spent, comment):
+    def log_time(self, issue_key, time_spent, comment, time_started):
         jira_api_url = f"{self.jira_domain}/rest/api/2/issue/{issue_key}/worklog"
 
         data = {
             "timeSpent": time_spent,
-            "comment": comment
+            "comment": comment,
+            "started": time_started
         }
 
         response = requests.post(jira_api_url, headers=self.headers, auth=self.auth, json=data)

@@ -22,11 +22,13 @@ from tkinter import messagebox, ttk
 from api import JiraAPI
 from color_scheme import Color
 from custom_style import CustomStyle
+from datetime import datetime
+import pytz
 
 class JiraLoggerApp:
     def __init__(self, master):
         self.master = master
-        self.master.geometry("400x510")
+        self.master.geometry("400x560")
         self.master.overrideredirect(True)
         self.set_window_position(1300, 120)
 
@@ -42,11 +44,11 @@ class JiraLoggerApp:
         self.canvas.pack(expand=True, fill='both')
 
         # Draw a rounded rectangle on the canvas that fills the window
-        self.rounded_rect = self.create_rounded_rectangle(20, 0, 380, 510, 10, fill=self.color.secondary_bg)
+        self.rounded_rect = self.create_rounded_rectangle(20, 0, 380, 560, 10, fill=self.color.secondary_bg)
 
         # Create an outer frame that will hold all the widgets
         self.outer_frame = tk.Frame(self.canvas, bg=self.color.secondary_bg, borderwidth=0, width=50, padx=5)
-        self.canvas.create_window((200, 255), window=self.outer_frame)
+        self.canvas.create_window((200, 255 + 20), window=self.outer_frame)
 
         # Title frame
         self.title_frame = tk.Frame(self.outer_frame, bg=self.color.secondary_bg, borderwidth=0)
@@ -134,8 +136,12 @@ class JiraLoggerApp:
         self.time_label = tk.Label(self.time_log_frame, text="Time Spent (e.g., 1h 30m):", bg=self.color.primary_bg, fg=self.color.secondary_fg)
         self.time_entry = tk.Text(self.time_log_frame, width=20, height=1, pady=5, padx=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
 
+        self.time_started_label = tk.Label(self.time_log_frame, text="Time Started (e.g., YYYY-MM-DD HH:MM):", bg=self.color.primary_bg, fg=self.color.secondary_fg)
+        self.date_started_entry = tk.Text(self.time_log_frame, width=20, height=1, pady=5, padx=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
+        self.time_started_entry = tk.Text(self.time_log_frame, width=20, height=1, pady=5, padx=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
+
         self.comment_label = tk.Label(self.time_log_frame, text="Work Description:", bg=self.color.primary_bg, fg=self.color.secondary_fg)
-        self.comment_entry = tk.Text(self.time_log_frame, width=40, height=5, padx=5, pady=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
+        self.log_comment_entry = tk.Text(self.time_log_frame, width=40, height=5, padx=5, pady=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
 
         self.perform_button = ttk.Button(self.time_log_frame, text="Create", command=self.log_time_on_existing_ticket, padding=(10, 5))
         self.perform_button.pack(side=tk.BOTTOM, pady=(2, 20))
@@ -149,8 +155,13 @@ class JiraLoggerApp:
         self.fetch_issue_button.pack(pady=5)
         self.time_label.pack(pady=2)
         self.time_entry.pack(pady=5)
+
+        self.time_started_label.pack(pady=2)
+        self.date_started_entry.pack(pady=2)
+        self.time_started_entry.pack(pady=5)
+
         self.comment_label.pack(pady=2)
-        self.comment_entry.pack(pady=5)
+        self.log_comment_entry.pack(pady=5)
         self.success_message_label.pack(pady=5)
 
     def setup_create_ticket_ui(self):
@@ -201,7 +212,6 @@ class JiraLoggerApp:
         self.perform_button.configure(cursor="hand2")
 
         self.comment_success_message_label = tk.Label(self.comment_ticket, text="", fg="green", bg=self.color.primary_bg)
-
 
         self.comment_issue_key_label.pack(pady=(15, 2))
         self.comment_issue_key_entry.pack(pady=5)
@@ -257,16 +267,54 @@ class JiraLoggerApp:
     def log_time_on_existing_ticket(self):
         issue_key = self.issue_key_entry.get("1.0", tk.END).strip()
         time_spent = self.time_entry.get("1.0", tk.END).strip()
-        comment = self.comment_entry.get("1.0", tk.END).strip()
+        work_description = self.log_comment_entry.get("1.0", tk.END).strip()
 
+        # Time Started
+        time_started_date = self.date_started_entry.get("1.0", tk.END).strip()
+        time_started_time = self.time_started_entry.get("1.0", tk.END).strip()
+
+        # Check if necessary fields are provided
         if not issue_key or not time_spent:
             messagebox.showerror("Error", "Issue key and time spent cannot be empty.")
             return
 
         try:
-            self.jira_api.log_time_on_issue(issue_key, time_spent, comment)
-            messagebox.showinfo("Success", f"Logged {time_spent} on {issue_key}.")
-            self.success_message_label.config(text=f"Logged {time_spent} on {issue_key}.")
+            local_tz = pytz.timezone('Asia/Manila')
+
+            if time_started_date and time_started_time:
+                # Both date and time are provided
+                time_started = f"{time_started_date} {time_started_time}"
+                time_started = datetime.strptime(time_started, "%Y-%m-%d %H:%M")
+                time_started = local_tz.localize(time_started)  # Localize to your timezone
+            elif time_started_date:
+                # Only date is provided, default to midnight (00:00)
+                time_started = f"{time_started_date} 00:00"
+                time_started = datetime.strptime(time_started, "%Y-%m-%d %H:%M")
+                time_started = local_tz.localize(time_started)  # Localize to your timezone
+            elif time_started_time:
+                # Only time is provided, use current date
+                today_date = datetime.now().strftime("%Y-%m-%d")
+                time_started = f"{today_date} {time_started_time}"
+                time_started = datetime.strptime(time_started, "%Y-%m-%d %H:%M")
+                time_started = local_tz.localize(time_started)  # Localize to your timezone
+            else:
+                # Neither date nor time is provided, use current datetime
+                time_started = datetime.now(local_tz)  # Get current time in your timezone
+
+            # Convert to UTC for JIRA API (JIRA uses UTC-based times)
+            time_started_utc = time_started.astimezone(pytz.utc)
+            
+            # Format the datetime to ISO 8601 format required by the JIRA API
+            time_started_str = time_started_utc.strftime("%Y-%m-%dT%H:%M:%S.000+0000")
+
+            # Call the API to log the time
+            self.jira_api.log_time(issue_key, time_spent, work_description, time_started_str)
+            
+            # Show success message
+            messagebox.showinfo("Success", f"Time logged successfully for issue {issue_key}")
+
+        except ValueError as ve:
+            messagebox.showerror("Error", f"Invalid date or time format: {ve}")
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
