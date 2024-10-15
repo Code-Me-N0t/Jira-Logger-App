@@ -6,4 +6,5 @@ class Color:
 
         self.primary_fg = "white"
         self.secondary_fg = "#B9B4C7"
-        self.tertiary = "#FBFCF8"
+        self.tertiary_fg = "#FBFCF8"
+        self.quaternary_fg = "black"

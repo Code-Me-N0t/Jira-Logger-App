@@ -2,6 +2,7 @@ from requests.auth import HTTPBasicAuth
 import requests
 from use_json import *
 from tkinter import messagebox
+import webbrowser
 
 class JiraAPI:
     def __init__(self):
@@ -9,6 +10,27 @@ class JiraAPI:
         self.jira_domain = f"{self.use['base_url']}"
         self.auth = HTTPBasicAuth(f"{self.use['email']}", f"{self.use['token']}")
         self.headers = { "Accept": "application/json" }
+
+    def search_jira(self, jql_query):
+        jira_api_url = f"{self.jira_domain}/rest/api/2/search"
+        
+        params = { 'jql': jql_query }
+        response = requests.get(jira_api_url, headers=self.headers, auth=self.auth, params=params)
+
+        if response.status_code == 200:
+            issues = response.json().get('issues', [])
+            if issues:
+                return [f"{issue['key']}: {issue['fields']['summary']}" for issue in issues]
+            else:
+                return ["No issues found."]
+        else:
+            raise Exception(f"Failed to fetch issues: {response.status_code} - {response.text}")
+        
+    def redirect_to_jira_issue(self, selected_issue):
+        issue_key = selected_issue.split(":")[0]  # Assuming the format is 'KEY: Summary'
+        issue_url = f"{self.use['base_url']}/browse/{issue_key}"  # Construct the URL
+        webbrowser.open(issue_url)
+
 
     def search_jira_issues(self, issue_key):
         jira_api_url = f"{self.jira_domain}/rest/api/2/issue/{issue_key}"
@@ -20,25 +42,6 @@ class JiraAPI:
             return f"{issue['key']}: {issue['fields']['summary']}"
         else:
             raise Exception(f"Failed to fetch issue: {response.status_code} - {response.text}")
-    
-    def search_jql_query(self, jql_entry):
-        jira_api_url = f"{self.jira_domain}/rest/api/2/search"
-
-        jql_query = jql_entry.get("1.0", "end-1c").strip()
-
-        query_params = {'jql': jql_query}
-        response = requests.get(jira_api_url, headers=self.headers, auth=self.auth, params=query_params)
-
-        if response.status_code == 200:
-            issues = response.json().get('issues', [])
-            if issues:
-                result = "\n".join([f"{issue['key']}: {issue['fields']['summary']}" for issue in issues])
-                messagebox.showinfo("Search Results", result)
-            else:
-                messagebox.showinfo("Search Results", "No issues found.")
-        else:
-            messagebox.showerror("Error", f"Failed to fetch issues: {response.status_code} - {response.text}")
-
 
     def log_time(self, issue_key, time_spent, comment, time_started):
         jira_api_url = f"{self.jira_domain}/rest/api/2/issue/{issue_key}/worklog"

@@ -103,17 +103,6 @@ class JiraLoggerApp:
         self.canvas.bind("<ButtonPress-1>", self.on_press)
         self.canvas.bind("<B1-Motion>", self.on_drag)
 
-    def perform_jql_search(self):
-        jql_query = self.jql_entry.get("1.0", tk.END).strip()
-        if not jql_query:
-            messagebox.showerror("Error", "JQL query cannot be empty.")
-            return
-        try:
-            issues = self.jira_api.search_jira_issues(jql_query)
-            messagebox.showinfo("Success", f"Fetched issues: {issues}")
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-
     def setup_search_ui(self):
         # Create a frame to hold the label and help icon together
         self.jql_frame = tk.Frame(self.search_frame, bg=self.color.primary_bg)
@@ -136,17 +125,83 @@ class JiraLoggerApp:
 
         self.jql_entry = tk.Text(self.search_frame, width=40, height=3, pady=5, padx=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
         
-        self.search_button = ttk.Button(self.search_frame, text="Search", command=lambda: self.jira_api.search_jql_query(self.jql_entry), padding=(10, 5))
+        self.search_button = ttk.Button(self.search_frame, text="Search", command=self.perform_jql_search, padding=(10, 5))
         self.search_button.configure(cursor="hand2")
 
         # Pack the JQL Entry and Search Button
         self.jql_entry.pack(pady=2)
         self.search_button.pack(pady=20)
 
+    
+    def perform_jql_search(self):
+        jql_query = self.jql_entry.get("1.0", tk.END).strip()
         
+        if not jql_query:
+            messagebox.showerror("Error", "JQL query cannot be empty.")
+            return
+        try:
+            issues = self.jira_api.search_jira(jql_query)  # Issues are returned as a list of strings
+            self.display_search_results(issues)  # Call a new function to display the search results
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def display_search_results(self, issues):
+        results_window = tk.Toplevel(self.master)
+        results_window.title("Search Results")
+        results_window.geometry("500x500+700+120")
+        results_window.configure(bg=self.color.primary_bg)
+
+        # Add a search bar for filtering results
+        search_label = tk.Label(results_window, text="Filter Results:", bg=self.color.primary_bg, fg=self.color.secondary_fg)
+        search_label.pack(pady=(10, 10))
+
+        # Customize the search entry to make it flat
+        search_entry = ttk.Entry(results_window)
+        search_entry.pack(fill=tk.X, padx=10, pady=5)
+        
+        # Style the Entry widget to be flat
+        style = ttk.Style()
+        style.configure("TEntry", relief="flat", borderwidth=0, background=self.color.secondary_bg, foreground=self.color.quaternary_fg, padding=5)
+        search_entry.configure(style="TEntry")
+
+        total_results_label = tk.Label(results_window, text=f"Total Results: {len(issues)}", bg=self.color.primary_bg, fg="#A39BBA")
+        total_results_label.pack(pady=(5, 5))
+
+        # Listbox to display the results
+        results_listbox = tk.Listbox(results_window, height=15, bg=self.color.secondary_bg, fg=self.color.secondary_fg)
+        results_listbox.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        for issue in issues:
+            results_listbox.insert(tk.END, issue)
+
+        def update_total_results(count):
+            total_results_label.config(text=f'Total Results: {count}')
+
+
+        # Filtering function for the search bar
+        def filter_results(event):
+            search_term = search_entry.get().lower()
+            results_listbox.delete(0, tk.END)
+            filtered_issues = []
+            for issue in issues:
+                if search_term in issue.lower():
+                    results_listbox.insert(tk.END, issue)
+                    filtered_issues.append(issue)
+            
+            update_total_results(len(filtered_issues))
+
+        search_entry.bind("<KeyRelease>", filter_results)
+
+        def on_issue_select(event):
+            selected_index = results_listbox.curselection()
+            if selected_index:
+                selected_issue = results_listbox.get(selected_index)
+                self.jira_api.redirect_to_jira_issue(selected_issue)
+
+        results_listbox.bind("<<ListboxSelect>>", on_issue_select)
+
 
     def setup_time_log_ui(self):
-        # Labels and Entries for logging time on existing issues
         self.issue_key_label = tk.Label(self.time_log_frame, text="Enter Issue Key (e.g., PRD-123):", bg=self.color.primary_bg, fg=self.color.secondary_fg)
         self.issue_key_entry = tk.Text(self.time_log_frame, width=20, height=1, pady=5, padx=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
 
@@ -168,8 +223,6 @@ class JiraLoggerApp:
         self.perform_button = ttk.Button(self.time_log_frame, text="Create", command=self.log_time_on_existing_ticket, padding=(10, 5))
         self.perform_button.pack(side=tk.BOTTOM, pady=(2, 20))
         self.perform_button.configure(cursor="hand2")
-
-        self.created_issue_label = tk.Label(self.time_log_frame, text="", fg="green", bg=self.color.primary_bg, width=40)
 
         # Pack all relevant widgets for time logging
         self.issue_key_label.pack(pady=(15, 2))
@@ -223,8 +276,6 @@ class JiraLoggerApp:
 
         self.comment_fetch_issue_button = ttk.Button(self.comment_ticket, text="Fetch Issue", command=self.comment_fetch_issue)
         self.comment_fetch_issue_button.configure(cursor="hand2")
-
-        self.created_issue_label = tk.Label(self.comment_ticket, text="", fg="green", bg=self.color.primary_bg, width=40)
 
         self.comment_label = tk.Label(self.comment_ticket, text="Comment:", bg=self.color.primary_bg, fg=self.color.secondary_fg)
         self.comment_entry = tk.Text(self.comment_ticket, width=40, height=5, padx=5, pady=5, bg=self.color.secondary_bg, fg=self.color.secondary_fg, borderwidth=0, relief="flat")
@@ -291,11 +342,9 @@ class JiraLoggerApp:
         time_spent = self.time_entry.get("1.0", tk.END).strip()
         work_description = self.log_comment_entry.get("1.0", tk.END).strip()
 
-        # Time Started
         time_started_date = self.date_started_entry.get("1.0", tk.END).strip()
         time_started_time = self.time_started_entry.get("1.0", tk.END).strip()
 
-        # Check if necessary fields are provided
         if not issue_key or not time_spent:
             messagebox.showerror("Error", "Issue key and time spent cannot be empty.")
             return
@@ -304,36 +353,27 @@ class JiraLoggerApp:
             local_tz = pytz.timezone('Asia/Manila')
 
             if time_started_date and time_started_time:
-                # Both date and time are provided
                 time_started = f"{time_started_date} {time_started_time}"
                 time_started = datetime.strptime(time_started, "%Y-%m-%d %H:%M")
-                time_started = local_tz.localize(time_started)  # Localize to your timezone
+                time_started = local_tz.localize(time_started)
             elif time_started_date:
-                # Only date is provided, default to midnight (00:00)
                 time_started = f"{time_started_date} 00:00"
                 time_started = datetime.strptime(time_started, "%Y-%m-%d %H:%M")
-                time_started = local_tz.localize(time_started)  # Localize to your timezone
+                time_started = local_tz.localize(time_started)
             elif time_started_time:
-                # Only time is provided, use current date
                 today_date = datetime.now().strftime("%Y-%m-%d")
                 time_started = f"{today_date} {time_started_time}"
                 time_started = datetime.strptime(time_started, "%Y-%m-%d %H:%M")
-                time_started = local_tz.localize(time_started)  # Localize to your timezone
+                time_started = local_tz.localize(time_started)
             else:
-                # Neither date nor time is provided, use current datetime
-                time_started = datetime.now(local_tz)  # Get current time in your timezone
+                time_started = datetime.now(local_tz)
 
-            # Convert to UTC for JIRA API (JIRA uses UTC-based times)
             time_started_utc = time_started.astimezone(pytz.utc)
-            
-            # Format the datetime to ISO 8601 format required by the JIRA API
             time_started_str = time_started_utc.strftime("%Y-%m-%dT%H:%M:%S.000+0000")
 
-            # Call the API to log the time
             self.jira_api.log_time(issue_key, time_spent, work_description, time_started_str)
             
-            # Show success message
-            messagebox.showinfo("Success", f"Time logged successfully for issue {issue_key}")
+            self.success_message_label.config(text=f"Time logged successfully for issue {issue_key}")
 
         except ValueError as ve:
             messagebox.showerror("Error", f"Invalid date or time format: {ve}")
